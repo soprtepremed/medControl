@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO & PWA Meta -->
+    <title>MedControl - Control de Notas Médicas</title>
+    <meta name="description" content="Sistema de control de notas de evolución médica. Registra pacientes, hallazgos quirúrgicos, signos vitales y plan médico.">
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MedControl">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- jsPDF para exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-hidden flex flex-col h-screen">
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- HEADER / NAV                                   -->
+    <!-- ══════════════════════════════════════════════ -->
+    <nav class="bg-blue-700 text-white safe-area-top shadow-md no-print z-50">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button id="menuBtn" class="p-2 hover:bg-white/10 rounded-full active-scale" aria-label="Abrir menú">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div>
+                    <span class="font-bold text-lg tracking-tight">MedControl</span>
+                    <span class="text-[10px] text-blue-200 ml-1 hidden sm:inline">Notas de Evolución</span>
+                </div>
+            </div>
+            <button id="addPatientBtn" class="bg-white text-blue-700 p-2 rounded-full shadow-lg active-scale" aria-label="Agregar paciente">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- CONTENIDO PRINCIPAL                            -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Overlay del Drawer (móvil) -->
+        <div id="drawerOverlay" class="drawer-overlay lg:hidden"></div>
+
+        <!-- Sidebar / Drawer -->
+        <aside id="drawer" class="fixed inset-0 z-[60] transform -translate-x-full transition-transform duration-300 lg:relative lg:translate-x-0 lg:w-72 bg-white border-r flex flex-col max-w-xs w-full">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="font-bold text-slate-700">
+                    <i data-lucide="users" class="w-4 h-4 inline mr-1"></i>
+                    Pacientes
+                </h2>
+                <button id="closeDrawer" class="lg:hidden p-1 text-slate-400 hover:text-slate-600" aria-label="Cerrar menú">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-3 bg-slate-50">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="pSearch" placeholder="Buscar por nombre..."
+                        class="w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                </div>
+            </div>
+            <div id="pList" class="flex-1 overflow-y-auto p-2 space-y-2 no-scrollbar">
+                <!-- Lista de pacientes (renderizada por JS) -->
+            </div>
+            <div class="p-3 border-t text-[10px] text-slate-400 bg-slate-50 font-mono">
+                UID: <span id="uidDisplay">conectando...</span>
+            </div>
+        </aside>
+
+        <!-- Vista Principal -->
+        <main class="flex-1 overflow-y-auto relative bg-slate-50 no-scrollbar pb-20">
+            
+            <!-- Estado Vacío -->
+            <div id="emptyState" class="h-full flex flex-col items-center justify-center p-10 text-center">
+                <div class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mb-4">
+                    <i data-lucide="folder-heart" class="w-10 h-10 text-blue-300"></i>
+                </div>
+                <p class="text-lg font-semibold text-slate-400">Seleccione un paciente</p>
+                <p class="text-sm text-slate-300 mt-1">o cree uno nuevo para empezar</p>
+            </div>
+
+            <!-- Vista del Paciente -->
+            <div id="patientView" class="hidden p-4 space-y-4">
+                
+                <!-- Tarjeta del Paciente -->
+                <div class="bg-white rounded-2xl shadow-sm border p-4 flex justify-between items-center">
+                    <div>
+                        <h1 id="pActiveName" class="text-xl font-bold text-slate-800 leading-tight">NOMBRE</h1>
+                        <p id="pActiveMeta" class="text-xs text-slate-500 font-medium mt-0.5"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="exportBtn" class="p-2.5 bg-slate-100 rounded-xl text-slate-600 active-scale hover:bg-slate-200 transition-colors" aria-label="Exportar PDF" title="Exportar PDF">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                        </button>
+                        <button id="addRecordBtn" class="p-2.5 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-200 active-scale hover:bg-blue-700 transition-colors" aria-label="Nueva nota" title="Nueva nota">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Registros Clínicos -->
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table id="recordsTable" class="w-full text-left border-collapse text-[10px] sm:text-xs">
+                            <thead class="bg-slate-800 text-white">
+                                <tr>
+                                    <th class="p-3 border-r border-slate-700 text-center w-14">#</th>
+                                    <th class="p-3 border-r border-slate-700 table-cell-min">Hallazgos Qx</th>
+                                    <th class="p-3 border-r border-slate-700 signos-cell">Signos Vitales</th>
+                                    <th class="p-3 border-r border-slate-700 table-cell-min">Plan / Indicaciones</th>
+                                    <th class="p-3">Pendientes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Registros (renderizados por JS) -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- MODAL: Nuevo Paciente                          -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="mPatient" class="fixed inset-0 z-[100] bg-black/60 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl modal-content">
+            <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white flex justify-between items-center">
+                <span class="font-bold flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    Nuevo Paciente
+                </span>
+                <button class="closeM p-1 hover:bg-white/20 rounded-full" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="fPatient" class="p-6 space-y-3">
+                <input type="text" name="name" required placeholder="Nombre completo *"
+                    class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-shadow text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" name="age" placeholder="Edad"
+                        class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <input type="text" name="cama" placeholder="Cama / Hab."
+                        class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <input type="text" name="dx" placeholder="Diagnóstico (Dx)"
+                    class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 mt-2">
+                    Crear Expediente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- MODAL: Nueva Nota de Evolución                 -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="mRecord" class="fixed inset-0 z-[100] bg-black/80 hidden items-center justify-center p-4 overflow-y-auto modal-backdrop">
+        <div class="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl my-auto modal-content">
+            <div class="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex justify-between items-center sticky top-0 z-10">
+                <span class="font-bold flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    Nueva Nota de Evolución
+                </span>
+                <button class="closeM p-1 hover:bg-white/20 rounded-full" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="fRecord" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Columna Izquierda -->
+                <div class="space-y-3">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Hallazgos y Antecedentes</label>
+                    <textarea name="hallazgos" required rows="4" placeholder="Hallazgos Quirúrgicos (Fecha y Descripción) *"
+                        class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"></textarea>
+                    <textarea name="antecedentes" rows="2" placeholder="Antecedentes relevantes"
+                        class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"></textarea>
+                    
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Signos Vitales</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="text" name="fc" placeholder="FC" class="p-2.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                        <input type="text" name="ta" placeholder="TA" class="p-2.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                        <input type="text" name="fr" placeholder="FR" class="p-2.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" name="temp" placeholder="Temp °C" class="p-2.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                        <input type="text" name="spo2" placeholder="SpO2 %" class="p-2.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                    </div>
+                </div>
+                
+                <!-- Columna Derecha -->
+                <div class="space-y-3">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan e Indicaciones</label>
+                    <textarea name="indicaciones" rows="4" placeholder="Indicaciones (Dieta, Soluciones, Meds)"
+                        class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"></textarea>
+                    <textarea name="plan" rows="2" placeholder="Plan médico"
+                        class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"></textarea>
+                    <textarea name="pendientes" rows="2" placeholder="Pendientes"
+                        class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-shadow border-red-200 bg-red-50/50"></textarea>
+                </div>
+                
+                <button type="submit" class="md:col-span-2 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Guardar Nota
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- TOAST Notification                             -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl toast-exit transition-all duration-300 z-[200] pointer-events-none text-sm font-medium"></div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PWA Install Banner                             -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="installBanner" class="install-banner no-print">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Instalar MedControl
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- APP Script (ES Module)                         -->
+    <!-- ══════════════════════════════════════════════ -->
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

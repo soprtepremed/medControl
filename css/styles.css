@@ -1,0 +1,153 @@
+/**
+ * MedControl - Estilos principales
+ * =================================
+ * Estilos complementarios a Tailwind CSS.
+ * Se mantienen aquí las reglas que no se pueden lograr
+ * o sería redundante manejar solo con utilidades de Tailwind.
+ */
+
+/* ──────────────── Base ──────────────── */
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* ──────────────── Safe Areas (Notch) ──────────────── */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ──────────────── Scrollbar Oculto ──────────────── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ──────────────── Efecto Tap Móvil ──────────────── */
+.active-scale:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* ──────────────── Toast Notificación ──────────────── */
+.toast-enter {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+.toast-exit {
+  opacity: 0;
+  transform: translateX(-50%) translateY(1rem);
+}
+
+/* ──────────────── Tabla Responsiva ──────────────── */
+@media (max-width: 640px) {
+  .table-cell-min {
+    min-width: 140px;
+  }
+
+  .signos-cell {
+    min-width: 100px;
+  }
+}
+
+/* ──────────────── Animaciones de Modales ──────────────── */
+.modal-backdrop {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ──────────────── Animación de Skeleton Loading ──────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ──────────────── Drawer Overlay (móvil) ──────────────── */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 55;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ──────────────── Botón Flotante de Instalar ──────────────── */
+.install-banner {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 25px -5px rgba(29, 78, 216, 0.4);
+  cursor: pointer;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  animation: bounceIn 0.5s ease-out;
+}
+
+.install-banner.show {
+  display: flex;
+}
+
+@keyframes bounceIn {
+  0% { transform: translateX(-50%) translateY(2rem); opacity: 0; }
+  60% { transform: translateX(-50%) translateY(-0.25rem); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* ──────────────── No imprimir elementos de UI ──────────────── */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

@@ -69,7 +69,7 @@ function exportPDF() {
 
     // ─── Tabla de registros ───
     doc.autoTable({
-      html: '#tableBody',
+      html: '#recordsTable',
       startY: 50,
       theme: 'grid',
       headStyles: {

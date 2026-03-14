@@ -14,12 +14,13 @@
 // ─── Configuración de Firebase ───
 // ⚠️ REEMPLAZA estos valores con tu configuración real de Firebase Console
 export const firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROYECTO.firebasestorage.app",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyA1TfaXEXb0BSKlqH7qJ9fz07xbI8KieRY",
+  authDomain: "medcontrol-28fd2.firebaseapp.com",
+  projectId: "medcontrol-28fd2",
+  storageBucket: "medcontrol-28fd2.firebasestorage.app",
+  messagingSenderId: "473542578852",
+  appId: "1:473542578852:web:b4abb6875437bff0970c31",
+  measurementId: "G-VYH9X4ZDP3"
 };
 
 /**

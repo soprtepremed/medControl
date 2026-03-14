@@ -5,7 +5,7 @@
  * Maneja la lista lateral, búsqueda y formulario de creación.
  */
 
-import { collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, addDoc, doc, deleteDoc, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showModal, hideModal, showToast, closeDrawerMobile } from './ui.js';
 import { loadRecords } from './records.js';
 import { APP_ID } from './firebase-config.js';
@@ -13,7 +13,9 @@ import { APP_ID } from './firebase-config.js';
 // ─── Estado del módulo ───
 let patients = [];
 let activePatientId = null;
-let unsubscribeRecords = null; // Para limpiar el listener anterior
+let unsubscribeRecords = null;
+let _db = null;
+let _uid = null;
 
 /**
  * Retorna el ID del paciente actualmente seleccionado
@@ -40,9 +42,30 @@ export function getPatients() {
  * @param {string} uid - ID del usuario autenticado
  */
 export function initPatients(db, uid) {
+  _db = db;
+  _uid = uid;
+
   // Botón de agregar paciente → abrir modal
   document.getElementById('addPatientBtn').addEventListener('click', () => {
     showModal('mPatient');
+  });
+
+  // Botón de eliminar paciente → abrir confirmación
+  document.getElementById('deletePatientBtn').addEventListener('click', () => {
+    if (!activePatientId) {
+      showToast('⚠️ Seleccione un paciente primero');
+      return;
+    }
+    const patient = patients.find(p => p.id === activePatientId);
+    document.getElementById('confirmMsg').innerText =
+      `¿Eliminar el expediente de "${patient?.name}"? Esta acción no se puede deshacer.`;
+    showModal('mConfirm');
+  });
+
+  // Botón de confirmar eliminación
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    hideModal('mConfirm');
+    await deletePatient(activePatientId);
   });
 
   // Listener en tiempo real: sincroniza pacientes desde Firestore
@@ -168,4 +191,44 @@ function selectPatient(patientId) {
   // Limpiar listener anterior y cargar registros del paciente seleccionado
   if (unsubscribeRecords) unsubscribeRecords();
   unsubscribeRecords = loadRecords(patientId);
+}
+
+/**
+ * Elimina un paciente y todos sus registros (subcolección) de Firestore.
+ * @param {string} patientId - ID del paciente a eliminar
+ */
+async function deletePatient(patientId) {
+  if (!patientId) return;
+
+  try {
+    showToast('🗑️ Eliminando expediente...');
+
+    // Primero eliminar todos los registros (subcolección)
+    const recordsRef = collection(
+      _db, 'artifacts', APP_ID, 'users', _uid, 'patients', patientId, 'records'
+    );
+    const recordsSnap = await getDocs(recordsRef);
+    const deletePromises = recordsSnap.docs.map(d => deleteDoc(d.ref));
+    await Promise.all(deletePromises);
+
+    // Luego eliminar el documento del paciente
+    const patientRef = doc(
+      _db, 'artifacts', APP_ID, 'users', _uid, 'patients', patientId
+    );
+    await deleteDoc(patientRef);
+
+    // Limpiar vista
+    activePatientId = null;
+    if (unsubscribeRecords) {
+      unsubscribeRecords();
+      unsubscribeRecords = null;
+    }
+    document.getElementById('patientView').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+
+    showToast('✅ Expediente eliminado');
+  } catch (error) {
+    console.error('Error al eliminar paciente:', error);
+    showToast('❌ Error al eliminar expediente');
+  }
 }

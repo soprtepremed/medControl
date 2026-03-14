@@ -15,6 +15,7 @@ let deferredInstallPrompt = null;
 export function initUI() {
   setupDrawer();
   setupModals();
+  setupHelpButton();
   setupPWAInstall();
 }
 
@@ -65,20 +66,30 @@ export function closeDrawerMobile() {
 
 /** Configura los botones de cierre de todos los modales */
 function setupModals() {
+  const allModals = ['mPatient', 'mRecord', 'mGuide', 'mConfirm'];
+
   document.querySelectorAll('.closeM').forEach(btn => {
     btn.addEventListener('click', () => {
-      hideModal('mPatient');
-      hideModal('mRecord');
+      allModals.forEach(id => hideModal(id));
     });
   });
 
   // Cerrar modal al hacer click en el backdrop
-  ['mPatient', 'mRecord'].forEach(id => {
+  allModals.forEach(id => {
     const modal = document.getElementById(id);
+    if (!modal) return;
     modal.addEventListener('click', (e) => {
       if (e.target === modal) hideModal(id);
     });
   });
+}
+
+/** Configura el botón de ayuda para abrir la guía rápida */
+function setupHelpButton() {
+  const helpBtn = document.getElementById('helpBtn');
+  if (helpBtn) {
+    helpBtn.addEventListener('click', () => showModal('mGuide'));
+  }
 }
 
 /**

@@ -46,9 +46,14 @@
                     <span class="text-[10px] text-blue-200 ml-1 hidden sm:inline">Notas de Evolución</span>
                 </div>
             </div>
-            <button id="addPatientBtn" class="bg-white text-blue-700 p-2 rounded-full shadow-lg active-scale" aria-label="Agregar paciente">
-                <i data-lucide="user-plus" class="w-5 h-5"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="helpBtn" class="p-2 hover:bg-white/10 rounded-full active-scale" aria-label="Guía de uso">
+                    <i data-lucide="help-circle" class="w-5 h-5"></i>
+                </button>
+                <button id="addPatientBtn" class="bg-white text-blue-700 p-2 rounded-full shadow-lg active-scale" aria-label="Agregar paciente">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -108,6 +113,9 @@
                         <p id="pActiveMeta" class="text-xs text-slate-500 font-medium mt-0.5"></p>
                     </div>
                     <div class="flex gap-2">
+                        <button id="deletePatientBtn" class="p-2.5 bg-red-50 rounded-xl text-red-500 active-scale hover:bg-red-100 transition-colors" aria-label="Eliminar expediente" title="Eliminar expediente">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
                         <button id="exportBtn" class="p-2.5 bg-slate-100 rounded-xl text-slate-600 active-scale hover:bg-slate-200 transition-colors" aria-label="Exportar PDF" title="Exportar PDF">
                             <i data-lucide="download" class="w-5 h-5"></i>
                         </button>
@@ -223,6 +231,117 @@
                     Guardar Nota
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- MODAL: Confirmar Eliminación                    -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="mConfirm" class="fixed inset-0 z-[100] bg-black/60 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl modal-content">
+            <div class="p-4 bg-gradient-to-r from-red-500 to-red-600 text-white flex justify-between items-center">
+                <span class="font-bold flex items-center gap-2">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    Confirmar Eliminación
+                </span>
+                <button class="closeM p-1 hover:bg-white/20 rounded-full" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 text-center space-y-4">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="trash-2" class="w-8 h-8 text-red-500"></i>
+                </div>
+                <p id="confirmMsg" class="text-sm text-slate-600 font-medium"></p>
+                <div class="flex gap-3">
+                    <button class="closeM flex-1 py-3 bg-slate-100 rounded-2xl font-bold text-slate-600 hover:bg-slate-200 transition-colors">Cancelar</button>
+                    <button id="confirmDeleteBtn" class="flex-1 py-3 bg-red-500 rounded-2xl font-bold text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="mGuide" class="fixed inset-0 z-[100] bg-black/60 hidden items-center justify-center p-4 overflow-y-auto modal-backdrop">
+        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl my-auto modal-content">
+            <div class="p-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white flex justify-between items-center sticky top-0 z-10">
+                <span class="font-bold flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Guía Rápida de Usuario
+                </span>
+                <button class="closeM p-1 hover:bg-white/20 rounded-full" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 max-h-[70vh] overflow-y-auto no-scrollbar">
+                
+                <!-- Paso 1 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">1</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Crear un Paciente</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Toca el botón <span class="inline-flex items-center bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md text-[10px] font-bold"><i data-lucide="user-plus" class="w-3 h-3 mr-0.5"></i> +</span> en la esquina superior derecha. Ingresa el nombre, edad, cama y diagnóstico del paciente.</p>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">2</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Seleccionar Paciente</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">En la barra lateral izquierda verás la lista de pacientes. Toca uno para ver su expediente. En móvil, usa el botón <span class="inline-flex items-center bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-md text-[10px] font-bold"><i data-lucide="menu" class="w-3 h-3 mr-0.5"></i> ☰</span> para abrir el menú.</p>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">3</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Agregar Nota de Evolución</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Con un paciente seleccionado, toca el botón <span class="inline-flex items-center bg-blue-600 text-white px-1.5 py-0.5 rounded-md text-[10px] font-bold"><i data-lucide="plus" class="w-3 h-3 mr-0.5"></i> +</span> azul. Completa los campos:</p>
+                        <ul class="text-[11px] text-slate-500 mt-1 space-y-0.5 ml-2">
+                            <li>• <strong>Hallazgos Qx:</strong> Descripción quirúrgica con fecha</li>
+                            <li>• <strong>Signos Vitales:</strong> FC, TA, FR, Temp, SpO2</li>
+                            <li>• <strong>Plan/Indicaciones:</strong> Dieta, medicamentos, soluciones</li>
+                            <li>• <strong>Pendientes:</strong> Estudios o acciones por realizar</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">4</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Buscar Pacientes</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Usa el campo de búsqueda en la barra lateral para filtrar pacientes por nombre. La búsqueda es instantánea.</p>
+                    </div>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">5</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Exportar expediente a PDF</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Toca el botón <span class="inline-flex items-center bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-md text-[10px] font-bold"><i data-lucide="download" class="w-3 h-3 mr-0.5"></i> ⬇</span> para descargar un PDF con todas las notas del paciente seleccionado.</p>
+                    </div>
+                </div>
+
+                <!-- Paso 6 -->
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">6</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Instalar como App</h3>
+                        <p class="text-xs text-slate-500 mt-0.5"><strong>Android:</strong> Toca el banner "Instalar MedControl" o ve al menú del navegador → Instalar app.<br><strong>iOS:</strong> Compartir → Agregar a pantalla de inicio.</p>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="bg-blue-50 rounded-2xl p-3 border border-blue-100">
+                    <p class="text-[11px] text-blue-700"><strong>💡 Tip:</strong> Todos los datos se guardan automáticamente en la nube. Puedes acceder desde cualquier dispositivo con la misma cuenta.</p>
+                </div>
+                <div class="bg-amber-50 rounded-2xl p-3 border border-amber-100">
+                    <p class="text-[11px] text-amber-700"><strong>⚠️ Importante:</strong> Al usar autenticación anónima, tus datos están vinculados a tu dispositivo/navegador. Si borras los datos del navegador, perderás acceso a los expedientes.</p>
+                </div>
+            </div>
         </div>
     </div>
 

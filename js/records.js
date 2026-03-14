@@ -10,19 +10,19 @@ import { showModal, hideModal, showToast } from './ui.js';
 import { getActivePatientId } from './patients.js';
 import { APP_ID } from './firebase-config.js';
 
-// ─── Referencia global a db y uid (se inyectan desde app.js) ───
+// ─── Referencia global a db y dataId (se inyectan desde app.js) ───
 let _db = null;
-let _uid = null;
+let _dataId = null;
 
 /**
  * Inicializa el módulo de registros.
  * Conecta el formulario y el botón de agregar registro.
  * @param {object} db - Instancia de Firestore
- * @param {string} uid - ID del usuario autenticado
+ * @param {string} dataId - ID del espacio de datos del usuario
  */
-export function initRecords(db, uid) {
+export function initRecords(db, dataId) {
   _db = db;
-  _uid = uid;
+  _dataId = dataId;
 
   // Botón de agregar registro → abrir modal
   document.getElementById('addRecordBtn').addEventListener('click', () => {
@@ -43,7 +43,7 @@ export function initRecords(db, uid) {
 
     try {
       const recordsRef = collection(
-        _db, 'artifacts', APP_ID, 'users', _uid, 'patients', activeId, 'records'
+        _db, 'artifacts', APP_ID, 'data', _dataId, 'patients', activeId, 'records'
       );
 
       await addDoc(recordsRef, {
@@ -80,7 +80,7 @@ export function initRecords(db, uid) {
  */
 export function loadRecords(patientId) {
   const recordsRef = collection(
-    _db, 'artifacts', APP_ID, 'users', _uid, 'patients', patientId, 'records'
+    _db, 'artifacts', APP_ID, 'data', _dataId, 'patients', patientId, 'records'
   );
 
   const unsubscribe = onSnapshot(recordsRef, (snapshot) => {

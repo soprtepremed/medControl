@@ -15,7 +15,7 @@ let patients = [];
 let activePatientId = null;
 let unsubscribeRecords = null;
 let _db = null;
-let _uid = null;
+let _dataId = null;
 
 /**
  * Retorna el ID del paciente actualmente seleccionado
@@ -39,11 +39,11 @@ export function getPatients() {
  * - Formulario de creación
  * - Búsqueda
  * @param {object} db - Instancia de Firestore
- * @param {string} uid - ID del usuario autenticado
+ * @param {string} dataId - ID del espacio de datos del usuario (desde PIN)
  */
-export function initPatients(db, uid) {
+export function initPatients(db, dataId) {
   _db = db;
-  _uid = uid;
+  _dataId = dataId;
 
   // Botón de agregar paciente → abrir modal
   document.getElementById('addPatientBtn').addEventListener('click', () => {
@@ -69,7 +69,7 @@ export function initPatients(db, uid) {
   });
 
   // Listener en tiempo real: sincroniza pacientes desde Firestore
-  const patientsRef = collection(db, 'artifacts', APP_ID, 'users', uid, 'patients');
+  const patientsRef = collection(db, 'artifacts', APP_ID, 'data', dataId, 'patients');
 
   onSnapshot(patientsRef, (snapshot) => {
     patients = snapshot.docs.map(doc => ({
@@ -205,7 +205,7 @@ async function deletePatient(patientId) {
 
     // Primero eliminar todos los registros (subcolección)
     const recordsRef = collection(
-      _db, 'artifacts', APP_ID, 'users', _uid, 'patients', patientId, 'records'
+      _db, 'artifacts', APP_ID, 'data', _dataId, 'patients', patientId, 'records'
     );
     const recordsSnap = await getDocs(recordsRef);
     const deletePromises = recordsSnap.docs.map(d => deleteDoc(d.ref));
@@ -213,7 +213,7 @@ async function deletePatient(patientId) {
 
     // Luego eliminar el documento del paciente
     const patientRef = doc(
-      _db, 'artifacts', APP_ID, 'users', _uid, 'patients', patientId
+      _db, 'artifacts', APP_ID, 'data', _dataId, 'patients', patientId
     );
     await deleteDoc(patientRef);
 

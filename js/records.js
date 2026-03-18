@@ -49,6 +49,9 @@ export function initRecords(db, dataId) {
       await addDoc(recordsRef, {
         hallazgos: fd.get('hallazgos')?.trim() || '',
         antecedentes: fd.get('antecedentes')?.trim() || '',
+        interrogatorio: fd.get('interrogatorio')?.trim() || '',
+        laboratorios: fd.get('laboratorios')?.trim() || '',
+        imagen: fd.get('imagen')?.trim() || '',
         signos: {
           fc: fd.get('fc')?.trim() || '',
           ta: fd.get('ta')?.trim() || '',
@@ -104,7 +107,7 @@ function renderRecordsTable(records) {
   if (records.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="p-8 text-center text-slate-400">
+        <td colspan="10" class="p-8 text-center text-slate-400">
           <p class="text-sm">Sin registros clínicos</p>
           <p class="text-xs mt-1">Presione + para agregar una nota</p>
         </td>
@@ -123,18 +126,17 @@ function renderRecordsTable(records) {
 
     return `
       <tr class="border-b hover:bg-slate-50/50 transition-colors">
-        <td class="p-3 border-r text-center align-top">
+        <td class="p-2 border-r text-center align-top">
           <span class="font-bold text-slate-400">${num}</span>
-          <div class="text-[8px] text-slate-300 mt-1">${fecha}</div>
+          <div class="text-[7px] text-slate-300 mt-1">${fecha}</div>
         </td>
-        <td class="p-3 border-r align-top table-cell-min">
+        <td class="p-2 border-r align-top table-cell-md">
+          <div class="text-slate-700 whitespace-pre-line">${escapeHTML(record.antecedentes)}</div>
+        </td>
+        <td class="p-2 border-r align-top table-cell-md">
           <div class="font-semibold text-slate-800 whitespace-pre-line">${escapeHTML(record.hallazgos)}</div>
-          ${record.antecedentes
-            ? `<div class="text-[9px] text-slate-400 mt-1 border-t pt-1">${escapeHTML(record.antecedentes)}</div>`
-            : ''
-          }
         </td>
-        <td class="p-3 border-r align-top signos-cell">
+        <td class="p-2 border-r align-top signos-cell">
           <div class="space-y-0.5 text-slate-600">
             ${formatSigno('FC', record.signos?.fc)}
             ${formatSigno('TA', record.signos?.ta)}
@@ -143,14 +145,22 @@ function renderRecordsTable(records) {
             ${formatSigno('SpO2', record.signos?.spo2)}
           </div>
         </td>
-        <td class="p-3 border-r align-top table-cell-min">
-          <div class="text-blue-700 font-medium whitespace-pre-line">${escapeHTML(record.indicaciones)}</div>
-          ${record.plan
-            ? `<div class="mt-1 text-slate-500 text-[10px] border-t pt-1 whitespace-pre-line">${escapeHTML(record.plan)}</div>`
-            : ''
-          }
+        <td class="p-2 border-r align-top table-cell-md">
+          <div class="text-slate-700 whitespace-pre-line">${escapeHTML(record.interrogatorio)}</div>
         </td>
-        <td class="p-3 align-top">
+        <td class="p-2 border-r align-top table-cell-md">
+          <div class="text-emerald-700 whitespace-pre-line">${escapeHTML(record.laboratorios)}</div>
+        </td>
+        <td class="p-2 border-r align-top table-cell-sm">
+          <div class="text-violet-700 whitespace-pre-line">${escapeHTML(record.imagen)}</div>
+        </td>
+        <td class="p-2 border-r align-top table-cell-md">
+          <div class="text-blue-700 font-medium whitespace-pre-line">${escapeHTML(record.indicaciones)}</div>
+        </td>
+        <td class="p-2 border-r align-top table-cell-md">
+          <div class="text-slate-600 whitespace-pre-line">${escapeHTML(record.plan)}</div>
+        </td>
+        <td class="p-2 align-top table-cell-md">
           <span class="font-bold text-red-600 whitespace-pre-line">${escapeHTML(record.pendientes)}</span>
         </td>
       </tr>

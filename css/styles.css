@@ -49,14 +49,98 @@ body {
   transform: translateX(-50%) translateY(1rem);
 }
 
-/* ──────────────── Tabla Responsiva ──────────────── */
-@media (max-width: 640px) {
-  .table-cell-min {
-    min-width: 140px;
-  }
+/* ──────────────── Tabla de 10 Columnas ──────────────── */
 
-  .signos-cell {
-    min-width: 100px;
+/**
+ * table-layout: fixed distribuye el ancho según los % asignados.
+ * Las proporciones están diseñadas para que la tabla ocupe
+ * el 100% del contenedor sin generar scroll horizontal.
+ * C(3%) + Antec(12%) + Hallaz(14%) + Signos(10%) + Interr(12%) + Labs(12%) + Img(7%) + Indic(12%) + Plan(10%) + Pend(8%) = 100%
+ */
+#recordsTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#recordsTable th,
+#recordsTable td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+/* Columna C (número) */
+#recordsTable th:nth-child(1),
+#recordsTable td:nth-child(1) {
+  width: 3%;
+}
+
+/* Antecedentes */
+#recordsTable th:nth-child(2),
+#recordsTable td:nth-child(2) {
+  width: 12%;
+}
+
+/* Hallazgos Qx */
+#recordsTable th:nth-child(3),
+#recordsTable td:nth-child(3) {
+  width: 14%;
+}
+
+/* Signos */
+.signos-cell,
+#recordsTable th:nth-child(4),
+#recordsTable td:nth-child(4) {
+  width: 10%;
+}
+
+/* Interrogatorio */
+#recordsTable th:nth-child(5),
+#recordsTable td:nth-child(5) {
+  width: 12%;
+}
+
+/* Laboratorios */
+#recordsTable th:nth-child(6),
+#recordsTable td:nth-child(6) {
+  width: 12%;
+}
+
+/* Imagen */
+.table-cell-sm,
+#recordsTable th:nth-child(7),
+#recordsTable td:nth-child(7) {
+  width: 7%;
+}
+
+/* Indicaciones */
+#recordsTable th:nth-child(8),
+#recordsTable td:nth-child(8) {
+  width: 12%;
+}
+
+/* Plan */
+#recordsTable th:nth-child(9),
+#recordsTable td:nth-child(9) {
+  width: 10%;
+}
+
+/* Pendientes */
+#recordsTable th:nth-child(10),
+#recordsTable td:nth-child(10) {
+  width: 8%;
+}
+
+/* Tamaño de fuente responsivo */
+@media (min-width: 768px) {
+  #recordsTable {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1280px) {
+  #recordsTable {
+    font-size: 12px;
   }
 }
 

@@ -76,23 +76,29 @@ function exportPDF() {
         fillColor: [30, 41, 59],   // slate-800
         textColor: [255, 255, 255],
         fontStyle: 'bold',
-        fontSize: 8,
-        halign: 'center'
+        fontSize: 6,
+        halign: 'center',
+        cellPadding: 2
       },
       bodyStyles: {
-        fontSize: 7,
-        cellPadding: 3,
+        fontSize: 6,
+        cellPadding: 2,
         valign: 'top'
       },
       alternateRowStyles: {
         fillColor: [248, 250, 252]  // slate-50
       },
       columnStyles: {
-        0: { cellWidth: 15, halign: 'center' },
-        1: { cellWidth: 70 },
-        2: { cellWidth: 35 },
-        3: { cellWidth: 80 },
-        4: { cellWidth: 60 }
+        0: { cellWidth: 10, halign: 'center' }, // C
+        1: { cellWidth: 30 },  // Antecedentes
+        2: { cellWidth: 35 },  // Hallazgos Qx
+        3: { cellWidth: 25 },  // Signos
+        4: { cellWidth: 30 },  // Interrogatorio
+        5: { cellWidth: 30 },  // Laboratorios
+        6: { cellWidth: 22 },  // Imagen
+        7: { cellWidth: 30 },  // Indicaciones
+        8: { cellWidth: 30 },  // Plan
+        9: { cellWidth: 30 }   // Pendientes
       },
       margin: { top: 50, left: 10, right: 10 },
       didDrawPage: (data) => {

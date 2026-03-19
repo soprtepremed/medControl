@@ -89,16 +89,16 @@ function exportPDF() {
         fillColor: [248, 250, 252]  // slate-50
       },
       columnStyles: {
-        0: { cellWidth: 10, halign: 'center' }, // C
-        1: { cellWidth: 30 },  // Antecedentes
-        2: { cellWidth: 35 },  // Hallazgos Qx
-        3: { cellWidth: 25 },  // Signos
-        4: { cellWidth: 30 },  // Interrogatorio
-        5: { cellWidth: 30 },  // Laboratorios
+        0: { cellWidth: 18, halign: 'center' }, // C (número + fecha)
+        1: { cellWidth: 28 },  // Antecedentes
+        2: { cellWidth: 32 },  // Hallazgos Qx
+        3: { cellWidth: 24 },  // Signos
+        4: { cellWidth: 28 },  // Interrogatorio
+        5: { cellWidth: 28 },  // Laboratorios
         6: { cellWidth: 22 },  // Imagen
         7: { cellWidth: 30 },  // Indicaciones
-        8: { cellWidth: 30 },  // Plan
-        9: { cellWidth: 30 }   // Pendientes
+        8: { cellWidth: 28 },  // Plan
+        9: { cellWidth: 28 }   // Pendientes
       },
       margin: { top: 50, left: 10, right: 10 },
       didDrawPage: (data) => {

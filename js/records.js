@@ -118,25 +118,31 @@ function renderRecordsTable(records) {
 
   tbody.innerHTML = records.map((record, index) => {
     const num = records.length - index;
-    const fecha = record.createdAt
-      ? new Date(record.createdAt.seconds * 1000).toLocaleDateString('es-MX', {
-          day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
-        })
-      : '';
+
+    // Formato compacto de fecha: DD/MM HH:MM (24h)
+    let fecha = '';
+    if (record.createdAt) {
+      const d = new Date(record.createdAt.seconds * 1000);
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      fecha = `${dd}/${mm} ${hh}:${min}`;
+    }
 
     return `
-      <tr class="border-b hover:bg-slate-50/50 transition-colors">
-        <td class="p-2 border-r text-center align-top">
+      <tr class="border-b hover:bg-slate-50/50 transition-colors record-row">
+        <td class="p-2 border-r text-center align-top" data-label="Nota">
           <span class="font-bold text-slate-400">${num}</span>
-          <div class="text-[7px] text-slate-300 mt-1">${fecha}</div>
+          <div class="text-[7px] text-slate-300 mt-1 fecha-sub">${fecha}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Antecedentes">
           <div class="text-slate-700 whitespace-pre-line">${escapeHTML(record.antecedentes)}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Hallazgos Qx">
           <div class="font-semibold text-slate-800 whitespace-pre-line">${escapeHTML(record.hallazgos)}</div>
         </td>
-        <td class="p-2 border-r align-top signos-cell">
+        <td class="p-2 border-r align-top" data-label="Signos">
           <div class="space-y-0.5 text-slate-600">
             ${formatSigno('FC', record.signos?.fc)}
             ${formatSigno('TA', record.signos?.ta)}
@@ -145,22 +151,22 @@ function renderRecordsTable(records) {
             ${formatSigno('SpO2', record.signos?.spo2)}
           </div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Interrogatorio">
           <div class="text-slate-700 whitespace-pre-line">${escapeHTML(record.interrogatorio)}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Laboratorios">
           <div class="text-emerald-700 whitespace-pre-line">${escapeHTML(record.laboratorios)}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-sm">
+        <td class="p-2 border-r align-top" data-label="Imagen">
           <div class="text-violet-700 whitespace-pre-line">${escapeHTML(record.imagen)}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Indicaciones">
           <div class="text-blue-700 font-medium whitespace-pre-line">${escapeHTML(record.indicaciones)}</div>
         </td>
-        <td class="p-2 border-r align-top table-cell-md">
+        <td class="p-2 border-r align-top" data-label="Plan">
           <div class="text-slate-600 whitespace-pre-line">${escapeHTML(record.plan)}</div>
         </td>
-        <td class="p-2 align-top table-cell-md">
+        <td class="p-2 align-top" data-label="Pendientes">
           <span class="font-bold text-red-600 whitespace-pre-line">${escapeHTML(record.pendientes)}</span>
         </td>
       </tr>
